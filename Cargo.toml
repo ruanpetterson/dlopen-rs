@@ -1,0 +1,10 @@
+[workspace]
+members = ["crates/animal-core", "crates/animal/*"]
+
+[package]
+name = "dlopen"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+animal-core = { path = "./crates/animal-core" }
