@@ -1,17 +1,33 @@
+use std::fs;
+use std::path::Path;
+
 use animal_core::Animal;
 
+const ANIMAL_PLUGIN_DIR: &str = env!("ANIMAL_PLUGIN_DIR");
+const ANIMAL_PLUGIN_PROFILE: &str = env!("ANIMAL_PLUGIN_PROFILE");
+
 fn main() {
-    let dog = {
-        let factory = <dyn Animal>::load_library("./target/release/libdog.dylib");
-        factory.build()
-    };
+    let mut plugins = vec![];
 
-    let cat = {
-        let factory = <dyn Animal>::load_library("./target/release/libcat.dylib");
-        factory.build()
-    };
+    let path = Path::new(ANIMAL_PLUGIN_DIR).join(ANIMAL_PLUGIN_PROFILE);
 
-    for animal in [dog, cat] {
-        println!("{}", animal.say());
+    for entry in fs::read_dir(&path).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        let Some(ext) = path.extension() else {
+            continue;
+        };
+
+        let Some("dylib" | "so") = ext.to_str() else {
+            continue;
+        };
+
+        let plugin = <dyn Animal>::load_library(path.to_str().unwrap()).build();
+        plugins.push(plugin);
+    }
+
+    for plugin in plugins {
+        println!("{}", plugin.say());
     }
 }

@@ -8,3 +8,7 @@ edition = "2024"
 
 [dependencies]
 animal-core = { path = "./crates/animal-core" }
+
+[build-dependencies]
+serde = { version = "1", features = ["derive"] }
+toml = "1"
